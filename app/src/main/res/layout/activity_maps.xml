@@ -1,0 +1,32 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/edit_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_message"
+        android:layout_toLeftOf="@string/button_search"
+        android:layout_above="@+id/map" />
+
+
+    <Button
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_search"
+        android:onClick="sendMessage"
+        android:layout_alignParentRight="true"
+        android:id="@+id/button" />
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        tools:context=".MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_below="@+id/button" />
+
+</RelativeLayout>
