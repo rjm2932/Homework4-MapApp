@@ -4,6 +4,7 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
+
     defaultConfig {
         applicationId "com.mycompany.homework4_mapapp"
         minSdkVersion 8
@@ -16,6 +17,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    packagingOptions {
+       exclude 'META-INF/LICENSE'
+       exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
     }
 }
 

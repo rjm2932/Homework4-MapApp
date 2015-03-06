@@ -1,9 +1,18 @@
 package com.mycompany.homework4_mapapp;
 
-import android.gesture.Prediction;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 
+import com.google.android.gms.identity.intents.Address;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -15,15 +24,11 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.client.util.Key;
-import com.mycompany.homework4_mapapp.MapsActivity;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.MapView;
-import com.google.api.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,59 +39,65 @@ public class MapsActivity extends FragmentActivity {
     private static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/geocode/json?";
     private static final String TYPE_AUTOCOMPLETE = "address=";
     private static final String OUT_JSON = "";
+    public ArrayList<Marker> markers = new ArrayList();
+    public Marker selectedMarker;
 
-
-    private ArrayList<String> autocomplete(String input) throws IOException {
-        ArrayList<String> resultList = new ArrayList<String>();
-
-
-            HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
-                        @Override
-                        public void initialize(HttpRequest request) {
-                            request.setParser(new JsonObjectParser(JSON_FACTORY));
-                        }
-              }
-            );
-
-            GenericUrl url = new GenericUrl(PLACES_API_BASE + TYPE_AUTOCOMPLETE);
-            url.put("input", input); //address
-            url.put("key", PLACES_API_KEY);
-
-
-            HttpRequest request = requestFactory.buildGetRequest(url);
-            HttpResponse httpResponse = request.execute();
-            PlacesResult directionsResult = httpResponse.parseAs(PlacesResult.class);
-
-            List<Prediction> predictions = directionsResult.predictions;
-            for (Prediction prediction : predictions) {
-                resultList.add(prediction.description);
-            }
-
-        return resultList;
-    }
-    public static class PlacesResult {
-
-        @Key("predictions")
-        public List<Prediction> predictions;
-
-    }
-
-    public static class Prediction {
-        @Key("description")
-        public String description;
-
-        @Key("id")
-        public String id;
-
-    }
+    private SupportMapFragment mapFragment;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    double latitude;
+    double longitude;
+    LatLng currentLoc;
+    List<Address> geocodeMatches = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mMap = mapFragment.getMap();
+        mMap.setMyLocationEnabled(true);
+
+
     }
+
+    public void sendMessage(View view){
+
+        EditText editText =(EditText) findViewById(R.id.edit_message);
+        String message = editText.getText().toString();
+
+        HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
+                                                                                    @Override
+                                                                                    public void initialize(HttpRequest request) {
+                                                                                        request.setParser(new JsonObjectParser(JSON_FACTORY));
+                                                                                    }
+                                                                                }
+        );
+
+
+        GenericUrl url = new GenericUrl(PLACES_API_BASE);
+        url.put("address", message); //address
+
+        HttpRequest request = null;
+        try {
+            request = requestFactory.buildGetRequest(url);
+            HttpResponse httpResponse = request.execute();
+            Results locationsResult = httpResponse.parseAs(Results.class);
+            if(locationsResult.resultsList.get(0)!=null){
+                Double latitude = Double.parseDouble(locationsResult.resultsList.get(0).location.lat);
+                Double longitude = Double.parseDouble(locationsResult.resultsList.get(0).location.lng);
+                currentLoc = new LatLng(latitude, longitude);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+    }
+
 
     @Override
     protected void onResume() {
@@ -94,7 +105,30 @@ public class MapsActivity extends FragmentActivity {
         setUpMapIfNeeded();
     }
 
-    ArrayList<String> result = autocomplete("now");
+    public void addMarkerToMap(LatLng latLng) {
+        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng)
+                .title("title")
+                .snippet("snippet"));
+        markers.add(marker);
+
+    }
+    public void clearMarkers() {
+        mMap.clear();
+        markers.clear();
+    }
+
+    public void removeSelectedMarker() {
+        this.markers.remove(this.selectedMarker);
+        this.selectedMarker.remove();
+    }
+    private void highLightMarker(int index) {
+        highLightMarker(markers.get(index));
+    }
+    private void highLightMarker(Marker marker) {
+        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        marker.showInfoWindow();
+        this.selectedMarker=marker;
+    }
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
@@ -134,4 +168,28 @@ public class MapsActivity extends FragmentActivity {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
+
+    public static class Results {
+
+        @Key("results")
+        public List<Geometry> resultsList;
+
+    }
+
+    public static class Geometry {
+
+        @Key("geometry")
+        public Location location;
+
+    }
+
+
+    public static class Location {
+        @Key("lat")
+        public String lat;
+
+        @Key("lng")
+        public String lng;
+
+    }
 }

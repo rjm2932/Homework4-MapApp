@@ -29,4 +29,59 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_below="@+id/button" />
 
+<!--
+<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:alignmentMode="alignBounds"
+    app:orientation="horizontal"
+    android:padding="16dp"
+    app:useDefaultMargins="true"
+    app:columnCount="1" >
+
+    <TextView
+        android:id="@+id/from_label"
+        app:layout_gravity="fill_horizontal"
+        android:text="@string/from"
+        android:textColor="?android:textColorSecondary" />
+
+    <AutoCompleteTextView
+        android:id="@+id/from"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        app:layout_gravity="fill_horizontal"
+        android:completionThreshold="3" />
+
+    <TextView
+        android:id="@+id/to_label"
+        app:layout_gravity="fill_horizontal"
+        android:text="@string/to"
+        android:textColor="?android:textColorSecondary" />
+
+    <AutoCompleteTextView
+        android:id="@+id/to"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        app:layout_gravity="fill_horizontal"
+        android:completionThreshold="3" />
+
+    <Button
+        android:id="@+id/load_directions"
+        app:layout_columnSpan="@integer/create_account_pane_column_count"
+        app:layout_gravity="fill_horizontal"
+        android:text="@string/load_directions" />
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        tools:context=".MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_below="@+id/button" />
+
+</android.support.v7.widget.GridLayout> -->
+
+
 </RelativeLayout>
