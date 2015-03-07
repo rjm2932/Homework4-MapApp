@@ -48,6 +48,7 @@ public class MapsActivity extends FragmentActivity {
     LatLng currentLoc;
     List<Address> geocodeMatches = null;
     Button search;
+    public String locString = "blank";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +57,17 @@ public class MapsActivity extends FragmentActivity {
         //setUpMapIfNeeded();
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = mapFragment.getMap();
-        mMap.setMyLocationEnabled(true);
+        //mMap.setMyLocationEnabled(true);
         Button search = (Button)findViewById(R.id.button);
         search.setOnClickListener(findClickListener);
+        Button terrain = (Button)findViewById(R.id.terrain);
+        terrain.setOnClickListener(terrainClickListener);
+        Button hybrid = (Button)findViewById(R.id.hybrid);
+        hybrid.setOnClickListener(hybridClickListener);
+        Button normal = (Button)findViewById(R.id.normal);
+        normal.setOnClickListener(normalClickListener);
+        Button satellite = (Button)findViewById(R.id.satellite);
+        satellite.setOnClickListener(satelliteClickListener);
 
 
 
@@ -68,6 +77,37 @@ public class MapsActivity extends FragmentActivity {
         @Override
         public void onClick(View v) {
             sendMessage(v);
+
+        }
+    };
+
+    OnClickListener terrainClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switchTerrain(v);
+
+        }
+    };
+
+    OnClickListener normalClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switchNormal(v);
+
+        }
+    };
+
+    OnClickListener satelliteClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switchSatellite(v);
+
+        }
+    };
+    OnClickListener hybridClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switchHybrid(v);
 
         }
     };
@@ -104,6 +144,7 @@ public class MapsActivity extends FragmentActivity {
                 if(locationsResult.resultsList.size()>0){
                     currentLoc = new LatLng(locationsResult.resultsList.get(0).geometryList.location.lat,
                             locationsResult.resultsList.get(0).geometryList.location.lng);
+                    locString = locationsResult.resultsList.get(0).address;
 
                 }
 
@@ -117,9 +158,24 @@ public class MapsActivity extends FragmentActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             //.onPostExecute(aVoid);
-            mMap.addMarker(new MarkerOptions().position(currentLoc).title("Marker"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 17));
+            mMap.addMarker(new MarkerOptions().position(currentLoc).title(locString));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 10));
         }
+    }
+
+    public void switchTerrain(View v){
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+    }
+
+    public void switchHybrid(View v){
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
+    public void switchSatellite(View v){
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
+    public void switchNormal(View v){
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
     @Override
@@ -201,6 +257,9 @@ public class MapsActivity extends FragmentActivity {
 
         @Key("geometry")
         public Geometry geometryList;
+
+        @Key("formatted_address")
+        public String address;
 
     }
 
