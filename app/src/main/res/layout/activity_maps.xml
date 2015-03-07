@@ -16,9 +16,12 @@
         android:layout_width="96dp"
         android:layout_height="wrap_content"
         android:text="@string/button_search"
-        android:onClick="sendMessage"
+
         android:layout_alignParentRight="true"
         android:id="@+id/button" />
+    <!--android:onClick="findClickListener"-->
+
+
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
